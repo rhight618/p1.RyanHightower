@@ -9,5 +9,4 @@
 3. The listed items next the **Soften** picture are confusing.  Is that how many times the user should press the **+30 sec** button to the right of it?
 4. The **Express** Cook Label appears to only refer to the 2 button.  The braces around the 1,4 and 3,6 buttons are also confusing.
 
-
-[New Microwave Interface](https://rhight618.github.io/)
+project 1 URL: https://rhight618.github.io/p1.RyanHightower/

@@ -1,16 +1,24 @@
 int mainX = 520;
 int mainY = 720;
 String timerDisplayText = "Welcome";
-int setPresetNumber = 0;
-boolean cookReady = false;
-boolean settingPreset = false;
-boolean doOnce = false;
-boolean mouseReleased = true;
 
-String presetButton1Name = "Empty";
-String presetButton2Name = "Empty";
-String presetButton3Name = "Popcorn";
-String presetButton4Name = "Empty";
+boolean cookReady = false;
+
+
+boolean settingPresetName = false;
+boolean settingPresetTime = false;
+int setPresetID = 0;
+
+
+String presetButton1Name = "EMPTY";
+String presetButton2Name = "EMPTY";
+String presetButton3Name = "POPCORN";
+String presetButton4Name = "EMPTY";
+
+String presetButton1Time = "";
+String presetButton2Time = "";
+String presetButton3Time = "";
+String presetButton4Time = "";
 
 void setup() {
   size(520,720);
@@ -31,6 +39,7 @@ void draw() {
   presetButton(400,80,presetButton4Name,4);
   
   setPresetButton(100,250,"Set Preset");
+  enterButton(200,250,"Enter");
   
  
   int leftNumColumn = mainX - 395;
@@ -83,19 +92,18 @@ void draw() {
 void presetButton(int x, int y, String s, int id){
   
   int size = 20;
+  int offset = size+10;
   
-  if ((mouseX > x) && (mouseX < (x + size)) && 
+  if ((mouseX >= (x-offset)) && (mouseX <= (x + offset)) && 
     (mouseY < y) && (mouseY > (y - size))) {
     fill(150); // Grey
     if (mousePressed){
-      print(settingPreset);
-      print(setPresetNumber);
-      if((settingPreset)){
-        setPresetNumber = id;
-        resetPresetName(setPresetNumber);
-        timerDisplayUpdate("Enter Preset Name");
+      if((settingPresetName)){
+        setPresetID = id;
+        resetPresetName(setPresetID);
+        timerDisplayUpdate("Enter Name then Press Enter");
       }else{
-        timerDisplayUpdate("Cooking " + getPresetName(id));
+        timerDisplayUpdate("Cooking " + getPresetName(id) + " for " + getPresetTime(id));
         //cook for saved time
       }
       //fill(0);
@@ -113,15 +121,48 @@ void presetButton(int x, int y, String s, int id){
 void setPresetButton(int x, int y, String s){
   
   int size = 15;
+  int offset = size*2;
   
-  if ((mouseX > x) && (mouseX < (x + size)) && 
+  if ((mouseX >= (x-offset)) && (mouseX <= (x + offset)) && 
     (mouseY < y) && (mouseY > (y - size))) {
     fill(150); // White
     if (mousePressed){
       fill(0);
-      settingPreset = true;
-      setPresetNumber=0;
+      settingPresetName = true;
+      setPresetID=0;
       timerDisplayUpdate("Choose Preset Button");
+    }
+  } else {
+    fill(255); // Black
+  }
+  
+  textAlign(CENTER);
+  textSize(size);
+  text(s, x, y);
+  
+}
+
+
+void enterButton(int x, int y, String s){
+  
+  int size = 15;
+  int offset = size+10;
+  
+  if ((mouseX >= (x - offset)) && (mouseX <= (x + offset)) && 
+    (mouseY < y) && (mouseY > (y - size))) {
+    fill(150); // White
+    if(settingPresetName && mousePressed){
+      delay(100);
+      settingPresetName = false;
+      settingPresetTime = true;
+      resetPresetTime(setPresetID);
+      timerDisplayUpdate("Set Cook Time and Press Enter");
+    }else if (settingPresetTime && mousePressed){
+      delay(100);
+      timerDisplayUpdate(getPresetName(setPresetID) + " button set for " + getPresetTime(setPresetID));  
+      settingPresetName = false;
+      settingPresetTime = false;
+      setPresetID = 0;  
     }
   } else {
     fill(255); // Black
@@ -137,16 +178,18 @@ void setPresetButton(int x, int y, String s){
 void letteredButton(int x, int y, String s){
   
   int size = 24;
+  int offset = 3;
  
-  if ((mouseX >= x-3) && (mouseX <= (x + 3)) && 
+  if ((mouseX >= (x-offset)) && (mouseX <= (x + offset)) && 
     (mouseY <= y) && (mouseY > (y - size)) &&
-    settingPreset) {
+    settingPresetName) {
     fill(255,0,0);
-    if(settingPreset && mousePressed){
-        setPresetName(setPresetNumber,s);
+    if(settingPresetName && mousePressed){
+      delay(500);
+      setPresetName(setPresetID,s);
     } 
   } else {
-      if(settingPreset){
+      if(settingPresetName && setPresetID > 0){
         fill(255);
       }else{
         fill(0);
@@ -164,18 +207,21 @@ void letteredButton(int x, int y, String s){
 void numberedButton(int x, int y, String s){
   
   int size = 28;
+  int offset = 10;
   
-  if ((mouseX > x) && (mouseX < (x + size)) && 
+  if ((mouseX > (x-offset)) && (mouseX < (x + offset)) && 
     (mouseY < y) && (mouseY > (y - size))) {
     fill(150); // White
     if (mousePressed){
       
-      if(settingPreset){
-        //test;
-      }
+      if(settingPresetTime){
+        delay(500);
+        setPresetTime(setPresetID, s);
+        timerDisplayUpdate(getPresetTime(setPresetID));
+      }else
       
       fill(0);
-      timerDisplayUpdate(s);
+      //timerDisplayUpdate(s);
     }
   } else {
     fill(255); // Black
@@ -193,10 +239,10 @@ void clearButton(int x, int y, String s){
     fill(150); // White
     if (mousePressed){
       fill(0);
-      setPresetNumber=0;
+      setPresetID=0;
       timerDisplayUpdate("Welcome");
       cookReady=false;
-      settingPreset=false;
+      settingPresetName=false;
     }
   } else {
     fill(255); // Black
@@ -235,6 +281,50 @@ void startButton(int x, int y, String s){
 
 void timerDisplayUpdate(String s){
   timerDisplayText=s;
+}
+
+void resetPresetTime(int id){
+  
+  if(id==1){
+    presetButton1Time="";
+  }else if (id==2){
+    presetButton2Time="";
+  }else if (id==3){
+    presetButton3Time="";
+  }else if (id==4){
+    presetButton4Time="";
+  }
+   
+}
+
+void setPresetTime(int id, String time){
+  
+  if(id==1){
+    presetButton1Time+=time;
+  }else if (id==2){
+    presetButton2Time+=time;
+  }else if (id==3){
+    presetButton3Time+=time;
+  }else if (id==4){
+    presetButton4Time+=time;
+  }
+   
+}
+
+String getPresetTime(int id){
+  
+  if(id==1){
+    return presetButton1Time;
+  }else if (id==2){
+    return presetButton2Time;
+  }else if (id==3){
+    return presetButton3Time;
+  }else if (id==4){
+    return presetButton4Time;
+  }
+  
+  return "";
+   
 }
 
 void resetPresetName(int id){

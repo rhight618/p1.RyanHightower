@@ -13,43 +13,30 @@ int setPresetID = -1;
 
 boolean timeCook = false;
 boolean timeDefrost = false;
-
-String presetButton1Name = "POPCORN";
-String presetButton2Name = "EMPTY";
-String presetButton3Name = "EMPTY";
-String presetButton4Name = "EMPTY";
-String presetButton5Name = "EMPTY";
-String presetButton6Name = "EMPTY";
-String presetButton7Name = "EMPTY";
-String presetButton8Name = "EMPTY";
-
   
 StringList presetTimes;
 StringList presetNames;
 
-String presetButton1Time = "";
-String presetButton2Time = "";
-String presetButton3Time = "";
-String presetButton4Time = "";
-
 int displayY=40;
 int presetRow1Y=100;
-int presetRow2Y=150;
-int functionsRowY=250;
+int presetTimeDisplayRow1Y=130;
+int presetRow2Y=170;
+int presetTimeDisplayRow2Y=200;
+int functionsRowY=300;
 int numberRow1Y=350;
 int numberRow2Y=425;
 int numberRow3Y=500;
 int numberRow4Y=575;
-int letterRowY=650;
+int letterRowY=625;
 
 void setup() {
-  size(520,720);
+  size(520,700);
   presetTimes = new StringList();
   presetNames = new StringList();
   
   for(int i = 0; i < presetButtonCount; i++){
       presetTimes.append("0");
-      presetNames.append("BOOBS");
+      presetNames.append("Empty");
   } //<>//
 }
 
@@ -70,6 +57,15 @@ void draw() {
   presetButton(200,presetRow2Y,getPresetName(5),5);
   presetButton(300,presetRow2Y,getPresetName(6),6);
   presetButton(400,presetRow2Y,getPresetName(7),7);
+  
+  presetTimeDisplay(100,presetTimeDisplayRow1Y,0);
+  presetTimeDisplay(200,presetTimeDisplayRow1Y,1);
+  presetTimeDisplay(300,presetTimeDisplayRow1Y,2);
+  presetTimeDisplay(400,presetTimeDisplayRow1Y,3);
+  presetTimeDisplay(100,presetTimeDisplayRow2Y,4);
+  presetTimeDisplay(200,presetTimeDisplayRow2Y,5);
+  presetTimeDisplay(300,presetTimeDisplayRow2Y,6);
+  presetTimeDisplay(400,presetTimeDisplayRow2Y,7);
   
   setPresetButton(100,functionsRowY,"Set Preset");
   enterButton(200,functionsRowY,"Enter");
@@ -121,6 +117,17 @@ void draw() {
   letteredButton(490,letterRowY,"Y");
   letteredButton(510,letterRowY,"Z");
 
+}
+
+
+void presetTimeDisplay(int x, int y, int id){
+  
+  int size = 20;
+  fill(0,0,255);
+  textAlign(CENTER);
+  textSize(size);
+  text(getPresetTime(id), x, y);
+  
 }
 
 void timedHeatingButton(int x, int y, String s){
@@ -207,14 +214,14 @@ void enterButton(int x, int y, String s){
     (mouseY < y) && (mouseY > (y - size))) {
     fill(150); // White
     if(settingPresetName && mousePressed){
-      delay(100);
+      delay(200);
       settingPresetName = false;
       settingPresetTime = true;
       resetPresetTime(setPresetID);
-      timerDisplayUpdate("Set Cook Time and Press Enter");
+      timerDisplayUpdate("Set Time(Secs) and Press Enter");
     }else if (settingPresetTime && mousePressed){
-      delay(100);
-      timerDisplayUpdate(getPresetName(setPresetID) + " button set for " + getPresetTime(setPresetID));  
+      delay(200);
+      timerDisplayUpdate(getPresetName(setPresetID) + " button set for " + getPresetTime(setPresetID) + " secs");  
       settingPresetName = false;
       settingPresetTime = false;
       setPresetID = -1;  
@@ -232,7 +239,7 @@ void enterButton(int x, int y, String s){
 
 void letteredButton(int x, int y, String s){
   
-  int size = 24;
+  int size = 26;
   int offset = 3;
  
   if ((mouseX >= (x-offset)) && (mouseX <= (x + offset)) && 
@@ -271,13 +278,17 @@ void numberedButton(int x, int y, String s){
       
       if(settingPresetTime){
         delay(500);
-        setPresetTime(setPresetID, s);
-        timerDisplayUpdate(getPresetTime(setPresetID));
+        if(getPresetTimeLengthById(setPresetID) < 4){
+          setPresetTime(setPresetID, s);
+          timerDisplayUpdate(getPresetTime(setPresetID));
+        }else{
+          timerDisplayUpdate("Max Cook Time Exceeded");
+        }
       }else
       
-      fill(0);
-      //timerDisplayUpdate(s);
-    }
+        fill(0);
+        //timerDisplayUpdate(s);
+      }
   } else {
     fill(255); // Black
   }
@@ -350,6 +361,11 @@ void setPresetTime(int id, String number){
 
 String getPresetTime(int id){
   return presetTimes.get(id);    
+}
+
+int getPresetTimeLengthById(int id){
+  String time = getPresetTime(id);
+  return time.length();
 }
 
 void resetPresetName(int id){

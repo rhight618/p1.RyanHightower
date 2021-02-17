@@ -126,7 +126,7 @@ void presetTimeDisplay(int x, int y, int id){
   fill(0,0,255);
   textAlign(CENTER);
   textSize(size);
-  text(getPresetTime(id), x, y);
+  text(getDisplayTimeFromString(getPresetTime(id)), x, y);
   
 }
 
@@ -165,7 +165,7 @@ void presetButton(int x, int y, String s, int id){
         resetPresetName(setPresetID);
         timerDisplayUpdate("Enter Name then Press Enter");
       }else{
-        timerDisplayUpdate("Cooking " + getPresetName(id) + " for " + getPresetTime(id));
+        timerDisplayUpdate("Cooking " + getPresetName(id) + " for " + getDisplayTimeFromString(getPresetTime(id)));
         //cook for saved time
       }
       //fill(0);
@@ -221,7 +221,7 @@ void enterButton(int x, int y, String s){
       timerDisplayUpdate("Set Time(Secs) and Press Enter");
     }else if (settingPresetTime && mousePressed){
       delay(200);
-      timerDisplayUpdate(getPresetName(setPresetID) + " button set for " + getPresetTime(setPresetID) + " secs");  
+      timerDisplayUpdate(getPresetName(setPresetID) + " button set for " +  getDisplayTimeFromString(getPresetTime(setPresetID)));  
       settingPresetName = false;
       settingPresetTime = false;
       setPresetID = -1;  
@@ -269,10 +269,10 @@ void letteredButton(int x, int y, String s){
 void numberedButton(int x, int y, String s){
   
   int size = 28;
-  int offset = 10;
+  int offset = 20;
   
-  if ((mouseX > (x-offset)) && (mouseX < (x + offset)) && 
-    (mouseY < y) && (mouseY > (y - size))) {
+  if ((mouseX >= (x-offset)) && (mouseX <= (x + offset)) && 
+    (mouseY <= y) && (mouseY >= (y - size))) {
     fill(150); // White
     if (mousePressed){
       
@@ -299,9 +299,10 @@ void numberedButton(int x, int y, String s){
 
 void clearButton(int x, int y, String s){
   int size = 15;
+  int offset = size + 25;
   
-  if ((mouseX > x) && (mouseX < (x + size)) && 
-    (mouseY < y) && (mouseY > (y - size))) {
+  if ((mouseX >= (x-offset)) && (mouseX <= (x + offset)) && 
+    (mouseY <= y) && (mouseY >= (y - size))) {
     fill(150); // White
     if (mousePressed){
       fill(0);
@@ -322,8 +323,9 @@ void clearButton(int x, int y, String s){
 
 void startButton(int x, int y, String s){
   int size = 15;
+  int offset = size + 10;
   
-  if ((mouseX > x) && (mouseX < (x + size)) && 
+  if ((mouseX >= (x-offset)) && (mouseX <= (x + offset)) && 
     (mouseY < y) && (mouseY > (y - size))) {
     fill(150); // White
     if (mousePressed){
@@ -366,6 +368,48 @@ String getPresetTime(int id){
 int getPresetTimeLengthById(int id){
   String time = getPresetTime(id);
   return time.length();
+}
+
+String getDisplayTimeFromString(String time){
+  
+  String returnvalue = "";
+  
+  if(time.length()> 0){
+    int intTime = Integer.valueOf(time);
+    int totalMinutes = intTime / 60;
+    int remainderSeconds= intTime % 60;
+    int hours = totalMinutes / 60;
+    int remainderMinutes = totalMinutes % 60;
+    
+    if(hours>0){
+      returnvalue+= hours + ":";
+    }
+    
+    if(remainderMinutes>0){
+      if(hours>0){
+        returnvalue+= padWithZeros(remainderMinutes) + ":";
+      }else{
+        returnvalue+= remainderMinutes + ":";
+      }
+    }
+    
+    if(remainderMinutes>0){
+      returnvalue+= padWithZeros(remainderSeconds) + "";
+    }else{
+      returnvalue+= remainderSeconds + "";
+    }
+  }
+  
+  return returnvalue; 
+}
+
+String padWithZeros(int time){
+  String returnValue = str(time);
+  
+  if(returnValue.length()<2){
+    returnValue = "0" + time;
+  }
+  return returnValue;
 }
 
 void resetPresetName(int id){

@@ -5,6 +5,8 @@ int mainY = 720;
 String timerDisplayText = "Welcome";
 
 boolean cookReady = false;
+boolean cooking = false;
+String cookingTime = "";
 
 int presetButtonCount = 8;
 boolean settingPresetName = false;
@@ -29,26 +31,50 @@ int numberRow3Y=500;
 int numberRow4Y=575;
 int letterRowY=625;
 
+int savedTime;
+int totalTime = 1000;
+int timerCount = 0;
+
 void setup() {
   size(520,700);
   presetTimes = new StringList();
   presetNames = new StringList();
   
   for(int i = 0; i < presetButtonCount; i++){
-      presetTimes.append("0");
-      presetNames.append("Empty");
+      presetTimes.append("5");
+      presetNames.append("stuff");
   } //<>//
+  
+  savedTime = millis();
 }
 
 void draw() {
-  background(1);
+  background(0);
   stroke(255);
+  
+  // Calculate how much time has passed
+  int passedTime = millis() - savedTime;
+  //print(timerCount);
+  if (passedTime > totalTime) {
+    if(cooking){
+      if(timerCount>0){
+        timerDisplayText = getDisplayTimeFromString(timerCount + "");
+        savedTime = millis(); // Save the current time to restart the timer!
+        timerCount--;
+      }else{
+        timerDisplayText="Cooking Complete";
+        timerCount=0;
+        cooking=false;
+      }
+    }
+  }
   
   fill(0,0,255);
   textSize(28);
   textAlign(CENTER);
   text(timerDisplayText, 250, displayY);
   
+    
   presetButton(100,presetRow1Y,getPresetName(0),0);
   presetButton(200,presetRow1Y,getPresetName(1),1);
   presetButton(300,presetRow1Y,getPresetName(2),2);
@@ -116,6 +142,22 @@ void draw() {
   letteredButton(470,letterRowY,"X");
   letteredButton(490,letterRowY,"Y");
   letteredButton(510,letterRowY,"Z");
+  
+  
+  fill(155);
+  textSize(18);
+  if(cooking){
+    text("Cooking", 440, 656);
+  }else{
+    text("Not Cooking", 420, 656);
+  }
+  
+  if(cooking){
+    fill(255,0,0);
+  }else{
+    fill(0,255,0);
+  }
+  circle(500,650,30);
 
 }
 
@@ -161,19 +203,19 @@ void presetButton(int x, int y, String s, int id){
     fill(150); // Grey
     if (mousePressed){
       if((settingPresetName)){
+        delay(200);
         setPresetID = id;
         resetPresetName(setPresetID);
         timerDisplayUpdate("Enter Name then Press Enter");
       }else{
-        timerDisplayUpdate("Cooking " + getPresetName(id) + " for " + getDisplayTimeFromString(getPresetTime(id)));
-        //cook for saved time
+         timerDisplayUpdate("Cooking " + getPresetName(id));
+         cooking = true;
+         timerCount = Integer.parseInt(getPresetTime(id));
       }
-      //fill(0);
     }
   } else {
     fill(255); // Black
   }
-
   textAlign(CENTER);
   textSize(size);
   text(s, x, y);
@@ -307,8 +349,9 @@ void clearButton(int x, int y, String s){
     if (mousePressed){
       fill(0);
       setPresetID=-1;
-      timerDisplayUpdate("Welcome");
+      timerDisplayUpdate("Cooking Stopped");
       cookReady=false;
+      cooking=false;
       settingPresetName=false;
     }
   } else {
@@ -387,16 +430,16 @@ String getDisplayTimeFromString(String time){
     
     if(remainderMinutes>0){
       if(hours>0){
-        returnvalue+= padWithZeros(remainderMinutes) + ":";
+        returnvalue+= padWithZeros(remainderMinutes);
       }else{
-        returnvalue+= remainderMinutes + ":";
+        returnvalue+= remainderMinutes; 
       }
     }
     
     if(remainderMinutes>0){
-      returnvalue+= padWithZeros(remainderSeconds) + "";
+      returnvalue+= ":" + padWithZeros(remainderSeconds) + "";
     }else{
-      returnvalue+= remainderSeconds + "";
+      returnvalue+= ":" + remainderSeconds + "";
     }
   }
   

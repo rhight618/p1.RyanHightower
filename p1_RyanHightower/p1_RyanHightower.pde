@@ -66,6 +66,7 @@ void draw() {
       }else{
         timerDisplayText="Cooking Complete";
         timerCount=0;
+        cookingTime="";
         cooking=false;
       }
     }
@@ -180,14 +181,19 @@ void timedHeatingButton(int x, int y, String s){
   int offset = size+20;
   
   if ((mouseX >= (x-offset)) && (mouseX <= (x + offset)) && 
-    (mouseY < y) && (mouseY > (y - size))) {
-    fill(150); // Grey
+    (mouseY < y) && (mouseY > (y - size)) && !cooking) {
+    fill(255,255,0); // Yellow
     if (mousePressed){
       timerDisplayUpdate("Enter Time and press Enter");
+      cookingTime="";
       settingCookTime=true;
     }
   } else {
-    fill(255); // Black
+    if(cooking){
+      fill(150); // Grey
+    }else{
+      fill(255); // White
+    }
   }
 
   textAlign(CENTER);
@@ -202,8 +208,8 @@ void presetButton(int x, int y, String s, int id){
   int offset = size+10;
   
   if ((mouseX >= (x-offset)) && (mouseX <= (x + offset)) && 
-    (mouseY < y) && (mouseY > (y - size))) {
-    fill(150); // Grey
+    (mouseY < y) && (mouseY > (y - size)) && !settingCookTime && !cooking) {
+    fill(255,255,0); // Yellow
     if (mousePressed){
       if((settingPresetName)){
         delay(200);
@@ -217,7 +223,11 @@ void presetButton(int x, int y, String s, int id){
       }
     }
   } else {
-    fill(255); // Black
+    if(settingCookTime || cooking){
+      fill(150); // Grey
+    }else{
+      fill(255); // White
+    }
   }
   textAlign(CENTER);
   textSize(size);
@@ -231,8 +241,8 @@ void setPresetButton(int x, int y, String s){
   int offset = size*2;
   
   if ((mouseX >= (x-offset)) && (mouseX <= (x + offset)) && 
-    (mouseY < y) && (mouseY > (y - size))) {
-    fill(150); // White
+    (mouseY < y) && (mouseY > (y - size)) && !settingCookTime && !cooking) {
+    fill(255,255,0); // Yellow
     if (mousePressed){
       fill(0);
       settingPresetName = true;
@@ -240,7 +250,11 @@ void setPresetButton(int x, int y, String s){
       timerDisplayUpdate("Choose Preset Button");
     }
   } else {
-    fill(255); // Black
+    if(settingCookTime || cooking){
+      fill(150); // Grey
+    }else{
+      fill(255); // White
+    }
   }
   
   textAlign(CENTER);
@@ -256,8 +270,8 @@ void enterButton(int x, int y, String s){
   int offset = size+10;
   
   if ((mouseX >= (x - offset)) && (mouseX <= (x + offset)) && 
-    (mouseY < y) && (mouseY > (y - size))) {
-    fill(150); // White
+    (mouseY < y) && (mouseY > (y - size)) && !settingCookTime && !cooking) {
+    fill(255,255,0); // Yellow
     if(settingPresetName && mousePressed){
       delay(200);
       settingPresetName = false;
@@ -272,7 +286,11 @@ void enterButton(int x, int y, String s){
       setPresetID = -1;  
     }
   } else {
-    fill(255); // Black
+    if(settingCookTime || cooking){
+      fill(150); // Grey
+    }else{
+      fill(255); // White
+    }
   }
   
   textAlign(CENTER);
@@ -290,7 +308,7 @@ void letteredButton(int x, int y, String s){
   if ((mouseX >= (x-offset)) && (mouseX <= (x + offset)) && 
     (mouseY <= y) && (mouseY > (y - size)) &&
     settingPresetName) {
-    fill(255,0,0);
+    fill(255,255,0); // Yellow
     if(settingPresetName && mousePressed){
       delay(500);
       setPresetName(setPresetID,s);
@@ -317,8 +335,8 @@ void numberedButton(int x, int y, String s){
   int offset = 20;
   
   if ((mouseX >= (x-offset)) && (mouseX <= (x + offset)) && 
-    (mouseY <= y) && (mouseY >= (y - size))) {
-    fill(150); // White
+    (mouseY <= y) && (mouseY >= (y - size)) && !cooking) {
+    fill(255,255,0); // Yellow
     if (mousePressed){  
       if(settingPresetTime){
         delay(500);
@@ -339,13 +357,17 @@ void numberedButton(int x, int y, String s){
           timerDisplayUpdate("Max Cook Time Exceeded");
         }
       }else{
-        fill(150);
+        fill(255,255,0); // Yellow
       }
     }else{
-      fill(150);
+      fill(255,255,0); // Yellow
     }
   } else {
-    fill(255); // Black
+    if(cooking){
+      fill(150); // Grey
+    }else{
+      fill(255); // White
+    }
   }
   
   textSize(size);
@@ -358,7 +380,7 @@ void clearButton(int x, int y, String s){
   
   if ((mouseX >= (x-offset)) && (mouseX <= (x + offset)) && 
     (mouseY <= y) && (mouseY >= (y - size))) {
-    fill(150); // White
+    fill(255,255,0); // Yellow
     if (mousePressed){
       fill(0);
       setPresetID=-1;
@@ -386,21 +408,26 @@ void startButton(int x, int y, String s){
   int offset = size + 10;
   
   if ((mouseX >= (x-offset)) && (mouseX <= (x + offset)) && 
-    (mouseY < y) && (mouseY > (y - size))) {
-    fill(150); // White
+    (mouseY < y) && (mouseY > (y - size)) && !cooking) {
+    fill(255,255,0); // Yellow
     if (mousePressed){
-      if(timeCook){
+      if(timeCook && cookingTime != ""){
         //fill(0);
         timerDisplayUpdate("Time Cooking");
         cooking = true;
+        settingCookTime=false;
         timerCount = Integer.parseInt(cookingTime);
       }else{
         fill(0);
-        timerDisplayUpdate("Select Cook Time or Preset");
+        timerDisplayUpdate("Select Function or Preset");
       }
     }
   } else {
-    fill(255); // Black
+    if(cooking){
+      fill(150); // Grey
+    }else{
+      fill(255); // White
+    }
   }
   
   textAlign(CENTER);

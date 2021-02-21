@@ -22,11 +22,12 @@ StringList presetTimes;
 StringList presetNames;
 
 int displayY=40;
-int presetRow1Y=100;
-int presetTimeDisplayRow1Y=130;
-int presetRow2Y=170;
-int presetTimeDisplayRow2Y=200;
-int functionsRowY=300;
+int presetLabelY=90;
+int presetRow1Y=125;
+int presetTimeDisplayRow1Y=155;
+int presetRow2Y=200;
+int presetTimeDisplayRow2Y=230;
+int functionsRowY=280;
 int numberRow1Y=350;
 int numberRow2Y=425;
 int numberRow3Y=500;
@@ -36,15 +37,16 @@ int letterRowY=625;
 int savedTime;
 int totalTime = 1000;
 int timerCount = 0;
+boolean doorOpen = false;
 
 void setup() {
-  size(520,700);
+  size(520,720);
   presetTimes = new StringList();
   presetNames = new StringList();
   
   for(int i = 0; i < presetButtonCount; i++){
-      presetTimes.append("5");
-      presetNames.append("stuff");
+      presetTimes.append("0");
+      presetNames.append("Empty");
   } //<>//
   
   savedTime = millis();
@@ -76,6 +78,12 @@ void draw() {
   textSize(28);
   textAlign(CENTER);
   text(timerDisplayText, 250, displayY);
+  
+  
+  fill(150);
+  textSize(20);
+  textAlign(CENTER);
+  text("Presets", 250, presetLabelY);
   
     
   presetButton(100,presetRow1Y,getPresetName(0),0);
@@ -146,6 +154,7 @@ void draw() {
   letteredButton(490,letterRowY,"Y");
   letteredButton(510,letterRowY,"Z");
   
+  doorButton(50, 680, "Door");
   
   fill(155);
   textSize(18);
@@ -161,7 +170,53 @@ void draw() {
     fill(0,255,0);
   }
   circle(500,650,30);
+  
+  
+  fill(155);
+  textSize(18);
+  if(doorOpen){
+    text("Door Open", 430, 697);
+  }else{
+    text("Door Closed", 420, 697);
+  }
+  
+  if(doorOpen){
+    fill(255,0,0);
+  }else{
+    fill(0,255,0);
+  }
+  circle(500,690,30);
 
+}
+
+void doorButton(int x, int y, String s){
+  
+  int size = 30;
+  int offset = size+20;
+  
+  if ((mouseX >= (x-offset)) && (mouseX <= (x + offset)) && 
+    (mouseY < y) && (mouseY > (y - size))) {
+    fill(255,255,0); // Yellow
+    if (mousePressed){
+      delay(200);
+      if(doorOpen){
+        doorOpen = false;
+      }else{
+        doorOpen = true;
+        timerDisplayUpdate("Door Open");
+        cookReady=false;
+        timeCook=false;
+        cooking=false;
+      }
+    }
+  } else {
+    fill(255); // White
+  }
+
+  textAlign(CENTER);
+  textSize(size);
+  text(s, x, y);
+  
 }
 
 
@@ -177,11 +232,11 @@ void presetTimeDisplay(int x, int y, int id){
 
 void timedHeatingButton(int x, int y, String s){
   
-  int size = 12;
+  int size = 15;
   int offset = size+20;
   
   if ((mouseX >= (x-offset)) && (mouseX <= (x + offset)) && 
-    (mouseY < y) && (mouseY > (y - size)) && !cooking) {
+    (mouseY < y) && (mouseY > (y - size)) && !cooking && setPresetID==-1) {
     fill(255,255,0); // Yellow
     if (mousePressed){
       timerDisplayUpdate("Enter Time and press Enter");
@@ -189,7 +244,7 @@ void timedHeatingButton(int x, int y, String s){
       settingCookTime=true;
     }
   } else {
-    if(cooking){
+    if(cooking || setPresetID>-1){
       fill(150); // Grey
     }else{
       fill(255); // White
@@ -216,10 +271,16 @@ void presetButton(int x, int y, String s, int id){
         setPresetID = id;
         resetPresetName(setPresetID);
         timerDisplayUpdate("Enter Name then Press Enter");
+      }else if(settingPresetTime){
+        timerDisplayUpdate("Finish Setting Time for " + getPresetName(setPresetID));
       }else{
-         timerDisplayUpdate("Cooking " + getPresetName(id));
-         cooking = true;
-         timerCount = Integer.parseInt(getPresetTime(id));
+         if(!doorOpen){
+           timerDisplayUpdate("Cooking " + getPresetName(id));
+           cooking = true;
+           timerCount = Integer.parseInt(getPresetTime(id));
+         }else{
+           timerDisplayUpdate("Close Door Before Cooking");
+         }
       }
     }
   } else {
@@ -237,11 +298,11 @@ void presetButton(int x, int y, String s, int id){
 
 void setPresetButton(int x, int y, String s){
   
-  int size = 15;
+  int size = 20;
   int offset = size*2;
   
   if ((mouseX >= (x-offset)) && (mouseX <= (x + offset)) && 
-    (mouseY < y) && (mouseY > (y - size)) && !settingCookTime && !cooking) {
+    (mouseY < y) && (mouseY > (y - size)) && !settingCookTime && !cooking && setPresetID==-1)  {
     fill(255,255,0); // Yellow
     if (mousePressed){
       fill(0);
@@ -250,7 +311,7 @@ void setPresetButton(int x, int y, String s){
       timerDisplayUpdate("Choose Preset Button");
     }
   } else {
-    if(settingCookTime || cooking){
+    if(settingCookTime || cooking || setPresetID > -1){
       fill(150); // Grey
     }else{
       fill(255); // White
@@ -266,27 +327,37 @@ void setPresetButton(int x, int y, String s){
 
 void enterButton(int x, int y, String s){
   
-  int size = 15;
+  int size = 20;
   int offset = size+10;
   
   if ((mouseX >= (x - offset)) && (mouseX <= (x + offset)) && 
-    (mouseY < y) && (mouseY > (y - size)) && !settingCookTime && !cooking) {
+    (mouseY < y) && (mouseY > (y - size)) && !settingCookTime && !cooking && setPresetID>-1) {
     fill(255,255,0); // Yellow
     if(settingPresetName && mousePressed){
       delay(200);
-      settingPresetName = false;
-      settingPresetTime = true;
-      resetPresetTime(setPresetID);
-      timerDisplayUpdate("Set Time(Secs) and Press Enter");
+      String presetName = getPresetName(setPresetID);
+      if(presetName.length() > 0){
+        settingPresetName = false;
+        settingPresetTime = true;
+        resetPresetTime(setPresetID);
+        timerDisplayUpdate("Set Time(Secs) and Press Enter");
+      }else{
+        timerDisplayUpdate("At Least One Charachter Required");
+      }
     }else if (settingPresetTime && mousePressed){
       delay(200);
-      timerDisplayUpdate(getPresetName(setPresetID) + " button set for " +  getDisplayTimeFromString(getPresetTime(setPresetID)));  
-      settingPresetName = false;
-      settingPresetTime = false;
-      setPresetID = -1;  
+      String presetTime = getPresetTime(setPresetID);
+      if(presetTime.length() > 0){
+        timerDisplayUpdate(getPresetName(setPresetID) + " button set for " +  getDisplayTimeFromString(getPresetTime(setPresetID)));  
+        settingPresetName = false;
+        settingPresetTime = false;
+        setPresetID = -1;  
+      }else{
+        timerDisplayUpdate("At Least One Number Required"); 
+      }
     }
   } else {
-    if(settingCookTime || cooking){
+    if(settingCookTime || cooking || setPresetID == -1){
       fill(150); // Grey
     }else{
       fill(255); // White
@@ -335,7 +406,7 @@ void numberedButton(int x, int y, String s){
   int offset = 20;
   
   if ((mouseX >= (x-offset)) && (mouseX <= (x + offset)) && 
-    (mouseY <= y) && (mouseY >= (y - size)) && !cooking) {
+    (mouseY <= y) && (mouseY >= (y - size)) && !cooking && !settingPresetName) {
     fill(255,255,0); // Yellow
     if (mousePressed){  
       if(settingPresetTime){
@@ -363,7 +434,7 @@ void numberedButton(int x, int y, String s){
       fill(255,255,0); // Yellow
     }
   } else {
-    if(cooking){
+    if(cooking || settingPresetName){
       fill(150); // Grey
     }else{
       fill(255); // White
@@ -375,7 +446,7 @@ void numberedButton(int x, int y, String s){
 }
 
 void clearButton(int x, int y, String s){
-  int size = 15;
+  int size = 20;
   int offset = size + 25;
   
   if ((mouseX >= (x-offset)) && (mouseX <= (x + offset)) && 
@@ -404,11 +475,11 @@ void clearButton(int x, int y, String s){
 
 
 void startButton(int x, int y, String s){
-  int size = 15;
+  int size = 20;
   int offset = size + 10;
   
   if ((mouseX >= (x-offset)) && (mouseX <= (x + offset)) && 
-    (mouseY < y) && (mouseY > (y - size)) && !cooking) {
+    (mouseY < y) && (mouseY > (y - size)) && !cooking && !doorOpen && !settingPresetName && !settingPresetTime) {
     fill(255,255,0); // Yellow
     if (mousePressed){
       if(timeCook && cookingTime != ""){
@@ -423,7 +494,7 @@ void startButton(int x, int y, String s){
       }
     }
   } else {
-    if(cooking){
+    if(cooking || doorOpen || settingPresetName || settingPresetTime){
       fill(150); // Grey
     }else{
       fill(255); // White

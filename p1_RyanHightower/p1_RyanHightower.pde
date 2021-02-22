@@ -2,7 +2,7 @@ import java.util.Map;
 
 int mainX = 520;
 int mainY = 720;
-String timerDisplayText = "Welcome";
+String timerDisplayText = "Welcome to My Microwave";
 
 boolean cookReady = false;
 boolean cooking = false;
@@ -201,6 +201,7 @@ void doorButton(int x, int y, String s){
       delay(200);
       if(doorOpen){
         doorOpen = false;
+        timerDisplayUpdate("Door Closed");
       }else{
         doorOpen = true;
         timerDisplayUpdate("Door Open");
@@ -455,7 +456,7 @@ void clearButton(int x, int y, String s){
     if (mousePressed){
       fill(0);
       setPresetID=-1;
-      timerDisplayUpdate("Welcome");
+      timerDisplayUpdate("Welcome to My Microwave");
       cookReady=false;
       timeCook=false;
       cooking=false;

@@ -1,26 +1,22 @@
 import java.util.Map;
 
+
+// global variables
 int mainX = 520;
 int mainY = 720;
 String timerDisplayText = "Welcome to My Microwave";
-
 boolean cookReady = false;
 boolean cooking = false;
-
 int presetButtonCount = 8;
 boolean settingPresetName = false;
 boolean settingPresetTime = false;
 boolean settingCookTime = false;
 int setPresetID = -1;
-
 boolean timeCook = false;
 boolean timeDefrost = false;
-
 String cookingTime = "";
-  
 StringList presetTimes;
 StringList presetNames;
-
 int displayY=40;
 int presetLabelY=90;
 int presetRow1Y=125;
@@ -33,7 +29,6 @@ int numberRow2Y=425;
 int numberRow3Y=500;
 int numberRow4Y=575;
 int letterRowY=625;
-
 int savedTime;
 int totalTime = 1000;
 int timerCount = 0;
@@ -41,14 +36,16 @@ boolean doorOpen = false;
 
 void setup() {
   size(520,720);
+  
+  //setting default values for the preset names and times
   presetTimes = new StringList();
   presetNames = new StringList();
-  
+  //loading default values
   for(int i = 0; i < presetButtonCount; i++){
       presetTimes.append("0");
       presetNames.append("Empty");
   } //<>//
-  
+  //saving time for the timer
   savedTime = millis();
 }
 
@@ -56,9 +53,8 @@ void draw() {
   background(0);
   stroke(255);
   
-  // Calculate how much time has passed
+  // This is the global timer.  It checks if 1 sec has passed.  Cooking Funcitons below use this timer for cook duration  
   int passedTime = millis() - savedTime;
-  //print(timerCount);
   if (passedTime > totalTime) {
     if(cooking){
       if(timerCount>0){
@@ -74,18 +70,19 @@ void draw() {
     }
   }
   
+  //adding the Display Section
   fill(0,0,255);
   textSize(28);
   textAlign(CENTER);
   text(timerDisplayText, 250, displayY);
   
-  
+  //adding the Preset Label
   fill(150);
   textSize(20);
   textAlign(CENTER);
   text("Presets", 250, presetLabelY);
   
-    
+  // adding Preset Buttons to the display
   presetButton(100,presetRow1Y,getPresetName(0),0);
   presetButton(200,presetRow1Y,getPresetName(1),1);
   presetButton(300,presetRow1Y,getPresetName(2),2);
@@ -94,7 +91,7 @@ void draw() {
   presetButton(200,presetRow2Y,getPresetName(5),5);
   presetButton(300,presetRow2Y,getPresetName(6),6);
   presetButton(400,presetRow2Y,getPresetName(7),7);
-  
+  //adding Preset Times to the display
   presetTimeDisplay(100,presetTimeDisplayRow1Y,0);
   presetTimeDisplay(200,presetTimeDisplayRow1Y,1);
   presetTimeDisplay(300,presetTimeDisplayRow1Y,2);
@@ -103,7 +100,7 @@ void draw() {
   presetTimeDisplay(200,presetTimeDisplayRow2Y,5);
   presetTimeDisplay(300,presetTimeDisplayRow2Y,6);
   presetTimeDisplay(400,presetTimeDisplayRow2Y,7);
-  
+  //adding Function buttons to the display
   setPresetButton(100,functionsRowY,"Set Preset");
   enterButton(200,functionsRowY,"Enter");
   timedHeatingButton(300,functionsRowY,"Time Cook");
@@ -113,6 +110,7 @@ void draw() {
   int centerNumColumn = mainX - 265;
   int rightNumColumn = mainX - 125;
   
+  //adding Numbered Function buttons to the display
   numberedButton(leftNumColumn,numberRow1Y,"1");
   numberedButton(centerNumColumn,numberRow1Y,"2");
   numberedButton(rightNumColumn,numberRow1Y,"3");
@@ -124,9 +122,11 @@ void draw() {
   numberedButton(rightNumColumn,numberRow3Y,"9");
   numberedButton(centerNumColumn,numberRow4Y,"0");
   
+  //adding Start/Clear Function buttons to the display
   clearButton(leftNumColumn, numberRow4Y, "Stop/Clear");
   startButton(rightNumColumn, numberRow4Y, "Start");
   
+  //adding letter buttons to the display.  it is hidden until setting a preset is active
   letteredButton(10,letterRowY,"A");
   letteredButton(30,letterRowY,"B");
   letteredButton(50,letterRowY,"C");
@@ -154,8 +154,11 @@ void draw() {
   letteredButton(490,letterRowY,"Y");
   letteredButton(510,letterRowY,"Z");
   
+  //adding the door button
   doorButton(50, 680, "Door");
   
+  
+  //State labels show cooking/not cooking  and Door Open/Closed  states
   fill(155);
   textSize(18);
   if(cooking){
@@ -188,6 +191,8 @@ void draw() {
   circle(500,690,30);
 
 }
+
+//Button functions
 
 void doorButton(int x, int y, String s){
   

@@ -281,6 +281,8 @@ void presetButton(int x, int y, String s, int id){
         timerDisplayUpdate("Finish Setting Time for " + getPresetName(setPresetID));
       }else{
          if(!doorOpen){
+           //updates the time count so that the global timer will start countin down
+           // sets the cooking  state to to true
            timerDisplayUpdate("Cooking " + getPresetName(id));
            cooking = true;
            timerCount = Integer.parseInt(getPresetTime(id));
@@ -489,7 +491,8 @@ void startButton(int x, int y, String s){
     fill(255,255,0); // Yellow
     if (mousePressed){
       if(timeCook && cookingTime != ""){
-        //fill(0);
+        //updates the time count so that the global timer will start countin down
+        // sets the cooking  state to to true
         timerDisplayUpdate("Time Cooking");
         cooking = true;
         settingCookTime=false;
@@ -535,6 +538,7 @@ int getPresetTimeLengthById(int id){
   return time.length();
 }
 
+//converts seconds to hours:minutes:seconds for display
 String getDisplayTimeFromString(String time){
   
   String returnvalue = "";
